@@ -33,10 +33,14 @@ function updateUserData(name, mobile) {
     });
 }
 
+app.set('view engine','ejs');
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: true
 }));
+
+app.use(express.static(__dirname+'/public'));
 
 app.get('/time',function(req,res,next){
     res.json({
@@ -44,15 +48,11 @@ app.get('/time',function(req,res,next){
     });
 });
 
-app.use(function (req, res, next) {
-    console.log(`${req.method} request for ${req.url} - ${JSON.stringify(req.body)}`);
-    next();
+app.get('/',function(req,res){
+    res.render('index');
 });
 
-app.use(express.static("./public"));
-
 app.post('/users', function (req, res) {
-    console.log(req.body.name);
     database.ref('/users/' + req.body.name).once('value', function (data) {
         var value = data.val();
         if(value==null)  writeUserData(req.body.name, req.body.mobile);
@@ -71,3 +71,5 @@ app.post('/users', function (req, res) {
 });
 
 app.listen(8080);
+
+console.log('node app running on port 8080');
