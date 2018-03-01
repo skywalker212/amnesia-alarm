@@ -1,0 +1,30 @@
+{
+  "name": "amnesia-alarm",
+  "version": "1.0.0",
+  "description": "A sms based alarm.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/skywalker212/amnesia-alarm.git"
+  },
+  "keywords": [
+    "alarm",
+    "sms",
+    "twilio",
+    "firebase"
+  ],
+  "author": "Akash Gajjar",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/skywalker212/amnesia-alarm/issues"
+  },
+  "homepage": "https://github.com/skywalker212/amnesia-alarm#readme",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
+    "firebase-admin": "^5.9.1"
+  }
+}
