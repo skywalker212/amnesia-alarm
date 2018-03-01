@@ -22,8 +22,10 @@ database.ref().child('onTime').set(inception);
 function writeUserData(name, mobile) {
     database.ref('users/' + name).set({
         fname: name.split(' ')[0],
+        lname: name.split(' ')[1],
         mobile: mobile,
-        failed: 0,
+        failed: false,
+        totalLog: 0
     });
 }
 
@@ -53,6 +55,7 @@ app.get('/',function(req,res){
 });
 
 app.post('/users', function (req, res) {
+    var total = 0;
     database.ref('/users/' + req.body.name).once('value', function (data) {
         var value = data.val();
         if(value==null)  writeUserData(req.body.name, req.body.mobile);
@@ -61,13 +64,25 @@ app.post('/users', function (req, res) {
     
     setTimeout(function(){
         database.ref('/users/' + req.body.name).once('value', function (data) {
+            total = data.child('totalLog').val();
             res.json(data);
         });
     },500);
 
     var timeout = setInterval(function(){
-        database.ref('/users/' + req.body.name).child('log').push(Math.random());
+        database.ref('/users/' + req.body.name).child('log').child(Date.now()).set(new Date().toString());
+        total++;
+        database.ref('/users/' +req.body.name).update({
+            failed: true,
+            totalLog: total.toString()
+        });
     },10000);
+});
+
+app.get('/users',function(req,res){
+    database.ref('/users/' + req.body.name).once('value', function (data) {
+        res.json(data);
+    });
 });
 
 app.listen(8080);

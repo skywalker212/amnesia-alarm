@@ -14,12 +14,12 @@
 
 <body>
     <div class="container">
-        <h1 class="text-center">Amnesia Alarm</h1>
+        <h1 class="header text-center"><a href='/'>Amnesia Alarm</a></h1>
         <div class="greeting text-center"></div>
         <div class="time text-center"></div>
-        <div class="main">
-            <div class="detail text-center">Please enter your Full Name and Mobile Number (with country code) in the form below.</div>
-            <form class="my-form form-horizontal text-center" action="/users">
+        <div class="main text-center">
+            <div class="detail">Please enter your Full Name (&lt;First Name&gt; &lt;Last Name&gt;) and Mobile Number (with country code) in the form below.</div>
+            <form class="my-form form-horizontal" action="/users">
                 <div class="form-group row">
                     <label class="control-label col-sm-2" for="name">Name: </label>
                     <div class="col-sm-8">
@@ -36,6 +36,7 @@
                 <button type="reset" style="margin-left:5%" class="button btn btn-warning">Reset</button>
             </form>
         </div>
+
     </div>
     <script src="script.js"></script>
 </body>
