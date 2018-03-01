@@ -1,8 +1,26 @@
 .my-form{
     width: 60%;
-    margin: 40px auto 0 auto;
+    margin: 30px auto 0 auto;
 }
 
 .button{
     margin-top: 10px;
+}
+
+.greeting{
+    font-family: monospace;
+    font-weight: bold;
+    font-size: 30px;
+}
+
+.time{
+    font-family: monospace;
+    font-weight: 70;
+    font-size: 15px;
+}
+
+.detail{
+    margin-top: 10px;
+    font-family: monospace;
+    font-size: 12px;
 }

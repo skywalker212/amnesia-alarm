@@ -15,8 +15,10 @@
 <body>
     <div class="container">
         <h1 class="text-center">Amnesia Alarm</h1>
-
+        <div class="greeting text-center"></div>
+        <div class="time text-center"></div>
         <div class="main">
+            <div class="detail text-center">Please enter your Full Name and Mobile Number (with country code) in the form below.</div>
             <form class="my-form form-horizontal text-center" action="/users">
                 <div class="form-group row">
                     <label class="control-label col-sm-2" for="name">Name: </label>
@@ -27,7 +29,7 @@
                 <div class="form-group row">
                     <label class="control-label col-sm-2" for="mobile">Mobile No:</label>
                     <div class="col-sm-8">
-                        <input type="number" class="form-control" id="mobile" name="mobile">
+                        <input type="text" class="form-control" id="mobile" name="mobile">
                     </div>
                 </div>
                 <button type="submit" class="button btn btn-primary">Submit</button>
