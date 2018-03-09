@@ -8,42 +8,38 @@ $.ajax({
 });
 
 function checkLog(name) {
-    $.ajax({
-        url: '/users',
-        type: 'GET',
-        dataType: 'json',
-        data:{
-            name: name
-        },
-        success: function (data) {
-            var html = '<div class="log"><p class="log-header">Failed SMS Attempts Log</p>';
+    console.log(name);
+    $.get("/user?name=" + name, function (data) {
+        var html = '<div class="log"><p class="log-header">Failed SMS Attempts Log</p>';
 
-            if (data.totalLog == false) {
-                html += '<p class="no-event">aha, there are still no failed events!</p>'
-                html += `<button onclick="checkLog('${json.fname} ${json.lname}')" class="btn btn-success">Check Again</button>`;
-            } else {
-                for (var event in json.log) {
-                    html += '<p class="log-detail">' + Math.floor((Date.now() - event) / 60000) + " minutes ago : " + json.log[event] + '</p>';
-                }
-                html += '</div>'
+        if (data.totalLog == 0) {
+            html += '<p class="no-event">aha, there are still no failed events!</p>'
+            html += `<button onclick="checkLog('${data.fname} ${data.lname}')" class="btn btn-success">Check Again</button>`;
+        } else {
+            for (var event in data.log) {
+                html += '<p class="log-detail">' + Math.floor((Date.now() - event) / 60000) + " minutes ago : " + data.log[event] + '</p>';
             }
-            $('.main').html(html);
+            html += `<button onclick="checkLog('${data.fname} ${data.lname}')" class="btn btn-success mybtn">Check Again</button>`;
+            html += '</div>'
         }
+        $('.main').html(html);
     });
 }
 
-$('.my-form').on('submit', function () {
+$('.my-form').on('submit', function (data) {
     $.post($(this).attr('action'), $(this).serialize(), function (json) {
-        $('.greeting').html("Hello, " + json.fname + "!");
+        if(json.new==true) $('.greeting').html("Hello, " + json.fname + "!");
+        else $('.greeting').html("Welcome Back, " + json.fname + "!");
         var html = '<div class="log"><p class="log-header">Failed SMS Attempts Log</p>';
 
-        if (json.totalLog == false) {
+        if (json.totalLog == 0) {
             html += '<p class="no-event">surprizingly, there are no failed events</p>'
             html += `<button onclick="checkLog('${json.fname} ${json.lname}')" class="btn btn-success">Check Again</button>`;
         } else {
             for (var event in json.log) {
                 html += '<p class="log-detail">' + Math.floor((Date.now() - event) / 60000) + " minutes ago : " + json.log[event] + '</p>';
             }
+            html += `<button onclick="checkLog('${json.fname} ${json.lname}')" class="btn btn-success mybtn">Check Again</button>`;
         }
         html += '</div>'
         $('.main').html(html);

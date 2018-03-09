@@ -58,6 +58,10 @@
     border-radius: 10px;
 }
 
+.mybtn{
+    margin-top: 10px;
+}
+
 ::-webkit-scrollbar {
     width: 12px;
 }

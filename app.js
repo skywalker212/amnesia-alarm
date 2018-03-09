@@ -24,33 +24,34 @@ function writeUserData(name, mobile) {
         fname: name.split(' ')[0],
         lname: name.split(' ')[1],
         mobile: mobile,
-        failed: false,
+        new: true,
         totalLog: 0
     });
 }
 
 function updateUserData(name, mobile) {
     database.ref('users/' + name).update({
-        mobile:mobile
+        mobile: mobile,
+        new: false
     });
 }
 
-app.set('view engine','ejs');
+app.set('view engine', 'ejs');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: true
 }));
 
-app.use(express.static(__dirname+'/public'));
+app.use(express.static(__dirname + '/public'));
 
-app.get('/time',function(req,res,next){
+app.get('/time', function (req, res, next) {
     res.json({
         mili: mili
     });
 });
 
-app.get('/',function(req,res){
+app.get('/', function (req, res) {
     res.render('index');
 });
 
@@ -58,29 +59,34 @@ app.post('/users', function (req, res) {
     var total = 0;
     database.ref('/users/' + req.body.name).once('value', function (data) {
         var value = data.val();
-        if(value==null)  writeUserData(req.body.name, req.body.mobile);
-        else updateUserData(req.body.name,req.body.mobile);
+        if (value == null) {
+            writeUserData(req.body.name, req.body.mobile);
+            setTimeout(function () {
+                database.ref('/users/' + req.body.name).once('value', function (data) {
+                    total = data.child('totalLog').val();
+                    res.json(data);
+                });
+            }, 500);
+            var timeout = setInterval(function () {
+                database.ref('/users/' + req.body.name).child('log').child(Date.now()).set(new Date().toString());
+                total++;
+                database.ref('/users/' + req.body.name).update({
+                    totalLog: total.toString()
+                });
+            }, 10000);
+        } else {
+            updateUserData(req.body.name, req.body.mobile);
+            database.ref('/users/' + req.body.name).once('value', function (data) {
+                res.json(data);
+            });
+        }
     });
-    
-    setTimeout(function(){
-        database.ref('/users/' + req.body.name).once('value', function (data) {
-            total = data.child('totalLog').val();
-            res.json(data);
-        });
-    },500);
 
-    var timeout = setInterval(function(){
-        database.ref('/users/' + req.body.name).child('log').child(Date.now()).set(new Date().toString());
-        total++;
-        database.ref('/users/' +req.body.name).update({
-            failed: true,
-            totalLog: total.toString()
-        });
-    },10000);
 });
 
-app.get('/users',function(req,res){
-    database.ref('/users/' + req.body.name).once('value', function (data) {
+app.get('/user', function (req, res) {
+    console.log("request for user " + req.query.name);
+    database.ref('/users/' + req.query.name).once('value', function (data) {
         res.json(data);
     });
 });
