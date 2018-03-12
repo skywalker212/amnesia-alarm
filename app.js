@@ -5,6 +5,9 @@ const bodyParser = require('body-parser');
 var date = new Date();
 var inception = date.toUTCString();
 var mili = Date.now();
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const client = require('twilio')(accountSid, authToken);
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
@@ -29,9 +32,8 @@ function writeUserData(name, mobile) {
     });
 }
 
-function updateUserData(name, mobile) {
+function updateUserData(name) {
     database.ref('users/' + name).update({
-        mobile: mobile,
         new: false
     });
 }
@@ -56,26 +58,26 @@ app.get('/', function (req, res) {
 });
 
 app.post('/users', function (req, res) {
-    var total = 0;
     database.ref('/users/' + req.body.name).once('value', function (data) {
         var value = data.val();
         if (value == null) {
             writeUserData(req.body.name, req.body.mobile);
             setTimeout(function () {
                 database.ref('/users/' + req.body.name).once('value', function (data) {
-                    total = data.child('totalLog').val();
                     res.json(data);
                 });
             }, 500);
             var timeout = setInterval(function () {
-                database.ref('/users/' + req.body.name).child('log').child(Date.now()).set(new Date().toString());
-                total++;
-                database.ref('/users/' + req.body.name).update({
-                    totalLog: total.toString()
-                });
-            }, 10000);
+                var hours = new Date().getHours();
+                if(hours>5 && hours<20){
+                    sendMessage(req.body.name,req.body.mobile,0);
+                }else{
+                    console.log('message not sent due to night.');
+                }
+
+            }, 3600000);
         } else {
-            updateUserData(req.body.name, req.body.mobile);
+            updateUserData(req.body.name);
             database.ref('/users/' + req.body.name).once('value', function (data) {
                 res.json(data);
             });
@@ -85,11 +87,38 @@ app.post('/users', function (req, res) {
 });
 
 app.get('/user', function (req, res) {
-    console.log("request for user " + req.query.name);
     database.ref('/users/' + req.query.name).once('value', function (data) {
         res.json(data);
     });
 });
+
+function sendMessage(name,mobile,failed){
+    client.messages.create({
+        to: mobile,
+        from: process.env.TWILIO_PHONE_NUMBER,
+        body: "Hello There, Your name is " +name + "\nRegards,\nTeam Memento"
+    },function (err, message) {
+        if (err) {
+            var failed;
+            database.ref('/users/' + name).once('value', function (data) {
+                failed = data.child('totalLog').val();
+            });
+            database.ref('/users/' + name).child('log').child(Date.now()).set(new Date().toString());
+            failed++;
+            database.ref('/users/' + name).update({
+                totalLog: failed.toString()
+            });
+            failed++;
+            if(failed>5) sendMessage(name,mobile,failed)
+        } else {
+            console.log('Success! The SID for this SMS message is:');
+            console.log(message.sid);
+     
+            console.log('Message sent on:');
+            console.log(message.dateCreated);
+        }
+    });
+}
 
 app.listen(8080);
 
