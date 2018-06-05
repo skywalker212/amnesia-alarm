@@ -8,6 +8,7 @@ var mili = Date.now();
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const client = require('twilio')(accountSid, authToken);
+const port = process.env.PORT || 3000;
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
@@ -120,6 +121,4 @@ function sendMessage(name,mobile,failed){
     });
 }
 
-app.listen(8080);
-
-console.log('node app running on port 8080');
+app.listen(port);
