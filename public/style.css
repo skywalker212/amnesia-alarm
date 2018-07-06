@@ -48,6 +48,10 @@
     color: rgb(57, 255, 57);
 }
 
+.footer{
+    margin: 20px 0;
+}
+
 .no-event{
     color: white;
 }

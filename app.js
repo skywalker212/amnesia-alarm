@@ -1,13 +1,34 @@
 var admin = require('firebase-admin');
-var serviceAccount = require('./serviceAccountKey.json');
 const express = require('express');
 const bodyParser = require('body-parser');
 var date = new Date();
 var inception = date.toUTCString();
 var mili = Date.now();
+const dotenv = require('dotenv');
+const path = require('path');
+
+global.path = path;
+global.dotenv = dotenv;
+
+loadENV();
+
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const client = require('twilio')(accountSid, authToken);
+
+const serviceAccount = {
+        "type":process.env.TYPE,
+        "project_id":process.env.PROJECT_ID,
+        "private_key_id":process.env.PRIVATE_KEY_ID,
+        "private_key":process.env.PRIVATE_KEY,
+        "client_email":process.env.CLIENT_EMAIL,
+        "client_id":process.env.CLIENT_ID,
+        "auth_uri":process.env.AUTH_URI,
+        "token_uri":process.env.TOKEN_URI,
+        "auth_provider_x509_cert_url":process.env.AUTH_PROVIDER,
+        "client_x509_cert_url":process.env.CLIENT_CERT
+}
+
 const port = process.env.PORT || 3000;
 
 admin.initializeApp({
@@ -121,4 +142,23 @@ function sendMessage(name,mobile,failed){
     });
 }
 
-app.listen(port);
+app.listen(port,()=>{
+    console.log('app running on port: ',port);
+});
+
+//function to load env variables
+
+function loadENV() {
+    const defaultConfig = dotenv.config({
+        path: path.resolve(process.cwd(), '.env.default')
+    });
+    const config = dotenv.config();
+
+    if (config.error && !defaultConfig.error) {
+        console.log("Could not find .env file, using default env file..");
+    }else if(config.error && defaultConfig.error) {
+        console.log("Could not find any .env files, please set one up!", 1);
+    }else {
+        console.log("Successfully loaded .env variables..");
+    }
+}
