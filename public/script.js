@@ -27,22 +27,28 @@ function checkLog(name) {
 }
 
 $('.my-form').on('submit', function (data) {
-    $.post($(this).attr('action'), $(this).serialize(), function (json) {
-        if(json.new==true) $('.greeting').html("Hello, " + json.fname + "!");
-        else $('.greeting').html("Welcome Back, " + json.fname + "!");
-        var html = '<div class="log"><p class="log-header">Failed SMS Attempts Log</p>';
-
-        if (json.totalLog == 0) {
-            html += '<p class="no-event">surprizingly, there are no failed events</p>'
-            html += `<button onclick="checkLog('${json.fname} ${json.lname}')" class="btn btn-success">Check Again</button>`;
-        } else {
-            for (var event in json.log) {
-                html += '<p class="log-detail">' + Math.floor((Date.now() - event) / 60000) + " minutes ago : " + json.log[event] + '</p>';
+    data.preventDefault();
+    var mobile = $('form #mobile').val();
+    var regex = /^\+[1-9]?[1-9]{1}[0-9]{10}$/;
+    if(regex.test(mobile)){
+        $.post($(this).attr('action'), $(this).serialize(), function (json) {
+            if(json.new==true) $('.greeting').html("Hello, " + json.fname + "!");
+            else $('.greeting').html("Welcome Back, " + json.fname + "!");
+            var html = '<div class="log"><p class="log-header">Failed SMS Attempts Log</p>';
+    
+            if (json.totalLog == 0) {
+                html += '<p class="no-event">surprizingly, there are no failed events</p>'
+                html += `<button onclick="checkLog('${json.fname} ${json.lname}')" class="btn btn-success">Check Again</button>`;
+            } else {
+                for (var event in json.log) {
+                    html += '<p class="log-detail">' + Math.floor((Date.now() - event) / 60000) + " minutes ago : " + json.log[event] + '</p>';
+                }
+                html += `<button onclick="checkLog('${json.fname} ${json.lname}')" class="btn btn-success mybtn">Check Again</button>`;
             }
-            html += `<button onclick="checkLog('${json.fname} ${json.lname}')" class="btn btn-success mybtn">Check Again</button>`;
-        }
-        html += '</div>'
-        $('.main').html(html);
-    }, 'json');
-    return false;
+            html += '</div>'
+            $('.main').html(html);
+        }, 'json');
+    }else{
+        alert('please enter a valid mobile number!');
+    }
 });
