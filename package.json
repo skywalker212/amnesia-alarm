@@ -5,7 +5,9 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified but for travis to finish build, we'll exit with 0\" && exit 0",
-    "start": "node app.js"
+    "start": "node app.js",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "repository": {
     "type": "git",
@@ -28,6 +30,8 @@
     "dotenv": "^6.0.0",
     "express": "^4.16.2",
     "firebase-admin": "^5.9.1",
-    "twilio": "^3.13.0"
-  }
+    "twilio": "^3.13.0",
+    "snyk": "^1.161.1"
+  },
+  "snyk": true
 }
